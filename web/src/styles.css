@@ -286,3 +286,68 @@ textarea.input { resize: vertical; font-family: var(--font-body); }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Payment card ---------- */
+.payment-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 32px; max-width: 480px; margin-top: 24px; box-shadow: var(--shadow);
+}
+.payment-card__price { display: flex; align-items: baseline; gap: 8px; margin-bottom: 20px; }
+.payment-card__amount { font-family: var(--font-brand); font-weight: 700; font-size: 48px; color: var(--forest); }
+.payment-card__period { font-size: 18px; color: var(--muted); }
+.payment-card__features { list-style: none; padding: 0; margin: 0 0 20px; display: flex; flex-direction: column; gap: 10px; }
+.payment-card__features li { font-size: 15px; color: var(--ink); }
+
+/* ---------- Subscription panel ---------- */
+.sub-panel { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); }
+.sub-panel__card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 24px; max-width: 480px; margin-top: 16px;
+}
+.sub-panel__row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px;
+}
+.sub-panel__row:last-of-type { border-bottom: none; }
+.sub-panel__row span:first-child { color: var(--muted); }
+.sub-badge { font-family: var(--font-brand); font-weight: 600; font-size: 13px; padding: 4px 12px; border-radius: 999px; }
+.sub-badge--active   { background: var(--pale); color: var(--forest); }
+.sub-badge--canceled { background: #fdecea; color: #a3341f; }
+.sub-badge--suspended { background: #fef3e2; color: #9a6200; }
+
+/* ---------- Neutral state (invited / draft / canceled — same appearance) ---------- */
+/* No negative framing: all three show the same gray "not yet certified" look.   */
+.stay-card--neutral {
+  opacity: 0.78;
+}
+.stay-card--neutral:hover {
+  border-color: var(--sage);
+  box-shadow: 0 4px 16px -8px rgba(20,60,40,0.12);
+  transform: translateY(-2px);
+}
+.stay-card__badge--neutral {
+  background: #f0f0f0;
+  color: #777;
+}
+.leaf-rating--neutral svg path:first-child {
+  fill: #D8E3DC;
+}
+
+.neutral-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--pale);
+  border: 1px solid var(--mint);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-size: 15px;
+  color: var(--forest);
+}
+.neutral-banner__icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+.score-card--neutral {
+  border-top: 4px solid var(--sage);
+  opacity: 0.75;
+}

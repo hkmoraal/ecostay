@@ -19,14 +19,22 @@ function slugify(text) {
 router.get('/', async (req, res, next) => {
   try {
     const { level, q } = req.query;
-    const status = req.query.status || 'certified';
+    // Default: show all statuses except hard-deleted (there is no delete).
+    // invited + draft = visible but no leaves (gray)
+    // certified = green with leaves
+    // canceled = grayed out with end date
+    // Pass ?status=certified for only certified, ?status=all for everything.
+    const statusParam = req.query.status;
     const where = [];
     const params = {};
 
-    if (status !== 'all') {
+    if (statusParam === 'certified') {
+      where.push("status = 'certified'");
+    } else if (statusParam && statusParam !== 'all') {
       where.push('status = :status');
-      params.status = status;
+      params.status = statusParam;
     }
+    // default (no param): all statuses are shown
     if (level != null && level !== '') {
       where.push('level = :level');
       params.level = Number(level);
@@ -37,7 +45,7 @@ router.get('/', async (req, res, next) => {
     }
     const sql =
       `SELECT id, slug, name, type, city, country, description, website,
-              image_url, score, level, status, updated_at
+              image_url, score, level, status, updated_at, canceled_at, invited_at
          FROM accommodations
         ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
         ORDER BY level DESC, score DESC, name ASC`;
@@ -53,7 +61,7 @@ router.get('/:slug', async (req, res, next) => {
   try {
     const [stay] = await query(
       `SELECT id, slug, name, type, city, country, description, website,
-              contact_email, image_url, score, level, status, created_at, updated_at
+              contact_email, image_url, score, level, status, created_at, updated_at, canceled_at
          FROM accommodations WHERE slug = :slug`,
       { slug: req.params.slug }
     );

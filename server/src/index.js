@@ -6,22 +6,28 @@ import { waitForDb } from './db.js';
 import criteriaRoutes from './routes/criteria.js';
 import accommodationRoutes from './routes/accommodations.js';
 import assessmentRoutes from './routes/assessments.js';
+import paymentRoutes from './routes/payments.js';
+import subscriptionRoutes from './routes/subscriptions.js';
+import invitationRoutes from './routes/invitations.js';
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+
+// Mollie webhook sends application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'ecostay-api' }));
 
 app.use('/api/criteria', criteriaRoutes);
 app.use('/api/accommodations', accommodationRoutes);
-// assessment endpoint is nested under an accommodation slug
 app.use('/api/accommodations', assessmentRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/invitations', invitationRoutes);
 
-// 404 for unknown API routes
 app.use('/api', (req, res) => res.status(404).json({ error: 'Onbekend endpoint' }));
 
-// Central error handler so routes can just call next(err).
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err);
