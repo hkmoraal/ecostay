@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ecostay
+      POSTGRES_USER: ecostay
+      POSTGRES_PASSWORD: ecostay
+    ports:
+      - "5432:5432"
+    # schema.sql then seed.sql run automatically on first startup
+    # (alphabetical order; "schema" sorts before "seed").
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d:ro
+      - ecostay_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecostay -d ecostay"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./server
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ecostay
+      DB_PASSWORD: ecostay
+      DB_NAME: ecostay
+      DB_SSL: "false"
+      CORS_ORIGIN: "http://localhost:5173"
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_API_URL: "http://localhost:4000"
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  ecostay_db:
