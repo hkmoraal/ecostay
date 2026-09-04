@@ -1,0 +1,12 @@
+{
+  "name": "Ecostay",
+  "short_name": "Ecostay",
+  "description": "Duurzaam overnachten, gecertificeerd.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#1e7a4d",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
