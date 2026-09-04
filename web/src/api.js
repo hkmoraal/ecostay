@@ -24,9 +24,12 @@ export const ownerToken = {
 };
 
 async function request(path, options = {}) {
+  const { headers: extraHeaders, ...rest } = options;
   const res = await fetch(`${BASE}/api${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
+    ...rest,
+    // Headers als laatste samenvoegen, zodat Content-Type nooit wordt
+    // overschreven door de sleutel-headers uit withAdmin/withKey/withOwner.
+    headers: { 'Content-Type': 'application/json', ...(extraHeaders || {}) },
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -88,6 +91,8 @@ export const api = {
     request(`/admin/stays/${slug}`, withAdmin({ method: 'PATCH', body: JSON.stringify(body) })),
   adminSetStatus: (slug, status) =>
     request(`/admin/stays/${slug}/status`, withAdmin({ method: 'POST', body: JSON.stringify({ status }) })),
+  adminDeleteStay: (slug) =>
+    request(`/admin/stays/${slug}`, withAdmin({ method: 'DELETE' })),
   adminAudits: (status = 'all') => request(`/admin/audits?status=${status}`, withAdmin()),
   adminAuditors: () => request('/admin/auditors', withAdmin()),
   adminGetAudit: (id) => request(`/audits/${id}`, withAdmin()),

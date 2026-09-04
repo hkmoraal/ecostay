@@ -695,3 +695,6 @@ textarea.input { resize: vertical; font-family: var(--font-body); }
 }
 .benefit-check--honey { background: #FBEFD6; color: var(--honey-deep, #B9821E); }
 .benefit-card .btn { margin-top: auto; align-self: flex-start; }
+
+.admin-delete { color: var(--rust); border-color: #E7C9BE; }
+.admin-delete:hover { background: #FBF1ED; border-color: var(--rust); }

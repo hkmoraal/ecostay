@@ -111,6 +111,42 @@ router.patch('/stays/:slug', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ---- Delete a stay (and everything linked, via ON DELETE CASCADE) ----
+router.delete('/stays/:slug', async (req, res, next) => {
+  try {
+    // Zeg eerst een eventueel actief Mollie-abonnement op (best effort).
+    try {
+      const [acc] = await query('SELECT id FROM accommodations WHERE slug = :slug', { slug: req.params.slug });
+      if (acc) {
+        const [sub] = await query(
+          `SELECT mollie_subscription_id, mollie_customer_id
+             FROM billing_subscriptions
+            WHERE accommodation_id = :acc AND status = 'active'
+            ORDER BY created_at DESC LIMIT 1`,
+          { acc: acc.id }
+        );
+        if (sub?.mollie_subscription_id && sub?.mollie_customer_id) {
+          const { mollie, mollieConfigured } = await import('../mollie.js');
+          if (mollieConfigured()) {
+            await mollie.customerSubscriptions.cancel(sub.mollie_subscription_id, {
+              customerId: sub.mollie_customer_id,
+            });
+          }
+        }
+      }
+    } catch (mErr) {
+      console.error('[admin] Mollie opzeggen bij verwijderen mislukt:', mErr.message);
+    }
+
+    const rows = await query(
+      'DELETE FROM accommodations WHERE slug = :slug RETURNING slug',
+      { slug: req.params.slug }
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'Verblijf niet gevonden' });
+    res.json({ deleted: true });
+  } catch (err) { next(err); }
+});
+
 // ---- Set status ----
 const STATUSES = ['invited', 'draft', 'certified', 'canceled'];
 router.post('/stays/:slug/status', async (req, res, next) => {

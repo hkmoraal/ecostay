@@ -181,6 +181,13 @@ function Stays() {
     catch (e) { setErr(e.message); }
     finally { setBusy(false); }
   }
+  async function remove(s) {
+    if (!confirm(`Weet je zeker dat je "${s.name}" definitief wilt verwijderen? Dit verwijdert ook de bijbehorende audits, beoordelingen en het abonnement. Dit kan niet ongedaan worden gemaakt.`)) return;
+    setBusy(true); setErr('');
+    try { await api.adminDeleteStay(s.slug); load(); }
+    catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  }
 
   return (
     <div>
@@ -273,6 +280,7 @@ function Stays() {
                       <option key={x} value={x}>→ {statusLabel(x)}</option>
                     ))}
                   </select>
+                  <button className="btn btn--ghost btn--small admin-delete" onClick={() => remove(s)}>Verwijder</button>
                 </div>
               </>
             )}
